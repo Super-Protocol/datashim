@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/golang/glog"
 )
 
 type gocryptfsEncrypter struct{}
@@ -43,13 +45,19 @@ func (enc *gocryptfsEncrypter) MountEncrypt(source string, target string, pass s
 
 func (enc *gocryptfsEncrypter) initialize(target string, passFile string) error {
 	targetDir := filepath.Dir(target)
-	tempInitDirPath := filepath.Join(targetDir, "temp-init")
+	tempInitDirName := "temp-init"
+	tempInitDirPath := filepath.Join(targetDir, tempInitDirName)
 
 	CreateFolderIfNotExists(tempInitDirPath)
 
 	// delete tempInitDirPath with all the content in any case
 	defer func() {
-		exec.Command("rm", "-rf", tempInitDirPath)
+		cmd := exec.Command("rm", "-rf", tempInitDirPath)
+		_, err := cmd.CombinedOutput()
+
+		if err != nil {
+			glog.V(2).Infof("error on delete temp init folder %s, err: %s", tempInitDirPath, err)
+		}
 	}()
 
 	args := []string{
@@ -64,10 +72,10 @@ func (enc *gocryptfsEncrypter) initialize(target string, passFile string) error 
 	}
 
 	copyCommandArgs := []string{
-		tempInitDirPath + "/*",
-		target,
+		"-c",
+		fmt.Sprintf("cp %s/* %s", tempInitDirPath, target),
 	}
-	cmd = exec.Command("cp", copyCommandArgs...)
+	cmd = exec.Command("/bin/sh", copyCommandArgs...)
 	out, err = cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error gocryptfs copy to target path on init, nargs: %s\noutput: %s", args, out)
