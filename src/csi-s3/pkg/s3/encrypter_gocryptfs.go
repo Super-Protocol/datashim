@@ -25,18 +25,17 @@ func (enc *gocryptfsEncrypter) MountEncrypt(source string, target string, pass s
 		target,
 	}
 
-	err = fuseMount(target, gocryptfsCmd, args)
-	if err != nil {
-		return err
-	}
-
 	configFile := filepath.Join(source, "gocryptfs.conf")
 	if !FileExists(configFile) {
 		err := enc.initialize(target, passFile)
 		if err != nil {
-			defer fuseUnmount(target)
 			return err
 		}
+	}
+
+	err = fuseMount(target, gocryptfsCmd, args)
+	if err != nil {
+		return err
 	}
 
 	return nil
