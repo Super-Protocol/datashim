@@ -17,6 +17,8 @@ func (enc *gocryptfsEncrypter) MountEncrypt(source string, target string, pass s
 		return err
 	}
 
+	defer DeleteFile(passFile)
+
 	args := []string{
 		"-passfile", passFile,
 		source,
@@ -28,15 +30,11 @@ func (enc *gocryptfsEncrypter) MountEncrypt(source string, target string, pass s
 		return err
 	}
 
-	err = DeleteFile(passFile)
-	if err != nil {
-		return err
-	}
-
 	configFile := filepath.Join(source, "gocryptfs.conf")
 	if !FileExists(configFile) {
 		err := enc.initialize(target, passFile)
 		if err != nil {
+			defer fuseUnmount(target)
 			return err
 		}
 	}

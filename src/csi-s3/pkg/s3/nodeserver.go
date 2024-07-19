@@ -131,11 +131,13 @@ func (ns *nodeServer) NodePublishVolume(ctx context.Context, req *csi.NodePublis
 
 		encrypter, err := NewEncrypter(s3.cfg.Encrypter)
 		if err != nil {
+			defer fuseUnmount(s3MountPath)
 			return nil, err
 		}
 
 		err = encrypter.MountEncrypt(s3MountPath, targetPath, s3.cfg.EncryptionKey)
 		if err != nil {
+			defer fuseUnmount(s3MountPath)
 			return nil, err
 		}
 	}
