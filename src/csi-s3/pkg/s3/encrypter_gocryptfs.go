@@ -27,7 +27,7 @@ func (enc *gocryptfsEncrypter) MountEncrypt(source string, target string, pass s
 
 	configFile := filepath.Join(source, "gocryptfs.conf")
 	if !FileExists(configFile) {
-		err := enc.initialize(target, passFile)
+		err := enc.initialize(source, passFile)
 		if err != nil {
 			return err
 		}
