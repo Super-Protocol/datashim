@@ -64,6 +64,8 @@ func (enc *gocryptfsEncrypter) initialize(target string, passFile string) error 
 		"-init",
 		"-passfile", passFile,
 		tempInitDirPath,
+		"--debug",
+		"--nosyslog",
 	}
 	cmd := exec.Command(gocryptfsCmd, args...)
 	out, err := cmd.CombinedOutput()
