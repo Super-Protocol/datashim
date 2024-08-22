@@ -60,7 +60,7 @@ func (s3fs *s3fsMounter) Mount(target string) error {
 		"-o", fmt.Sprintf("url=%s", s3fs.url),
 		"-o", "allow_other",
 		"-o", "compat_dir",
-		"-o", "sync,dirsync",
+		"-o", "dirsync",
 	}
 
 	return fuseMount(target, s3fsCmd, args)
