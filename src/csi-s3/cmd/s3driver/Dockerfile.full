@@ -17,6 +17,7 @@ RUN ls -l && \
 WORKDIR /
 RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && cd s3fs-fuse && \
 git checkout v1.94 && \
+git cherry-pick dd6815b && \
 ./autogen.sh && ./configure && make && make install
 
 # Install gocryptfs

@@ -23,6 +23,7 @@ func (enc *gocryptfsEncrypter) MountEncrypt(source string, target string, pass s
 
 	args := []string{
 		"-passfile", passFile,
+		"--allow_other",
 		source,
 		target,
 	}
