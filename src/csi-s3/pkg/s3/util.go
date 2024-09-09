@@ -134,12 +134,20 @@ func FileExists(filename string) bool {
 	if os.IsNotExist(err) {
 		return false
 	}
+	if err != nil {
+		glog.Errorf("Error checking if file exists: %v", err)
+		return false
+	}
 	return !info.IsDir()
 }
 
 func FolderExists(path string) bool {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
+		return false
+	}
+	if err != nil {
+		glog.Errorf("Error checking if folder exists: %v", err)
 		return false
 	}
 	return info.IsDir()
