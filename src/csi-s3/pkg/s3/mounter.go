@@ -51,11 +51,22 @@ func fuseMount(path string, command string, args []string) error {
 }
 
 func fuseUnmount(path string) error {
+	process, err := findFuseMountProcess(path)
+	if err != nil {
+		glog.Errorf("Error getting PID of checking mount existence: %s", err)
+		return nil
+	}
+	if process == nil {
+		glog.Warningf("Unable to find PID of checking mount existence %s, it must have finished already", path)
+		return nil
+	}
+
 	if err := mount.New("").Unmount(path); err != nil {
 		return err
 	}
+
 	// as fuse quits immediately, we will try to wait until the process is done
-	process, err := findFuseMountProcess(path)
+	process, err = findFuseMountProcess(path)
 	if err != nil {
 		glog.Errorf("Error getting PID of fuse mount: %s", err)
 		return nil
